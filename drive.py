@@ -59,7 +59,7 @@ def biggest(a, y, z):
 
 # rotate function
 def rotate(steps, direction, pin_dir, pin_step, span_delay):
-    if !span_delay or !steps:
+    if not span_delay or not steps:
         return
 
     GPIO.output(pin_dir, direction)
