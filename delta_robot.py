@@ -1,5 +1,6 @@
 import kinematics, drive
 import RPi.GPIO as GPIO
+import sys
 
 # pins
 PIN_DIR_MOT1 = 20
@@ -26,13 +27,21 @@ GPIO.output(PIN_STEP_MOT2, GPIO.LOW)
 GPIO.output(PIN_DIR_MOT3, GPIO.LOW)
 GPIO.output(PIN_STEP_MOT3, GPIO.LOW)
 
-# operations
+# mm from top
 z_home = -181.5926
-x = 40.0
-y = 0.0
-z = 50.0 + z_home
-(err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
-drive.drive_motors(deg1, deg2, deg3)
 
-GPIO.cleanup()
+try:
+    x = input('x:')
+    y = input('y:')
+    z = input('z:')
+    z += z_home
+
+    # operations
+    (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
+    if not err:
+        drive.drive_motors(deg1, deg2, deg3)
+except KeyboardInterrupt:
+    print('\nterminating...')
+    GPIO.cleanup()
+    sys.exit()
 
