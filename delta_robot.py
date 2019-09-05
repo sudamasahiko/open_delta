@@ -1,4 +1,5 @@
 import kinematics, drive
+import RPi.GPIO as GPIO
 
 # pins
 PIN_DIR_MOT1 = 20
