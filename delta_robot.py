@@ -28,9 +28,9 @@ GPIO.output(PIN_STEP_MOT3, GPIO.LOW)
 
 # operations
 z_home = -181.5926
-x = 10.0
-y = 10.0
-z = 10.0 + z_home
+x = 40.0
+y = 0.0
+z = 50.0 + z_home
 (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
 drive.drive_motors(deg1, deg2, deg3)
 
