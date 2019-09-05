@@ -31,15 +31,17 @@ GPIO.output(PIN_STEP_MOT3, GPIO.LOW)
 z_home = -181.5926
 
 try:
-    x = float(input('x:'))
-    y = float(input('y:'))
-    z = float(input('z:'))
-    z += z_home
+    while True:
+        x = float(input('x:'))
+        y = float(input('y:'))
+        z = float(input('z:'))
+        z += z_home
 
-    # operations
-    (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
-    if not err:
-        drive.drive_motors(deg1, deg2, deg3)
+        # operations
+        (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
+        if not err:
+            drive.drive_motors(deg1, deg2, deg3)
+
 except KeyboardInterrupt:
     print('\nterminating...')
     GPIO.cleanup()
