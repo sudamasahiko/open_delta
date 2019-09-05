@@ -31,9 +31,9 @@ GPIO.output(PIN_STEP_MOT3, GPIO.LOW)
 z_home = -181.5926
 
 try:
-    x = input('x:')
-    y = input('y:')
-    z = input('z:')
+    x = float(input('x:'))
+    y = float(input('y:'))
+    z = float(input('z:'))
     z += z_home
 
     # operations
