@@ -59,6 +59,9 @@ def biggest(a, y, z):
 
 # rotate function
 def rotate(steps, direction, pin_dir, pin_step, span_delay):
+    if !span_delay or !steps:
+        return
+
     GPIO.output(pin_dir, direction)
     for x in range(steps):
         GPIO.output(pin_step, GPIO.HIGH)
@@ -72,9 +75,20 @@ def drive_motors(deg1, deg2, deg3):
     (s_m3, d_m3) = arg_to_steps(deg3)
 
     max_step = biggest(s_m1, s_m2, s_m3)
-    span_m1 = 0.5 * DELAY_PER_STEP * max_step / s_m1
-    span_m2 = 0.5 * DELAY_PER_STEP * max_step / s_m2
-    span_m3 = 0.5 * DELAY_PER_STEP * max_step / s_m3
+    try:
+        span_m1 = 0.5 * DELAY_PER_STEP * max_step / s_m1
+    except:
+        span_m1 = None
+
+    try:
+        span_m2 = 0.5 * DELAY_PER_STEP * max_step / s_m2
+    except:
+        span_m2 = None
+
+    try:
+        span_m3 = 0.5 * DELAY_PER_STEP * max_step / s_m3
+    except:
+        span_m3 = None
 
     # execute rotation using threading
     pin_direc = PIN_DIR_MOT1
