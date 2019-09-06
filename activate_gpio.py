@@ -1,11 +1,7 @@
-# delta_robot.py
-# usage: python delta_robot.py
-# (C) Seltec Lab
-# license: MIT LICENSE
+# activate_gpio.py
+# python activate_gpio.py
 
-import kinematics, drive
 import RPi.GPIO as GPIO
-import sys
 
 # pins
 PIN_DIR_MOT1 = 20
@@ -31,24 +27,4 @@ GPIO.output(PIN_DIR_MOT2, GPIO.LOW)
 GPIO.output(PIN_STEP_MOT2, GPIO.LOW)
 GPIO.output(PIN_DIR_MOT3, GPIO.LOW)
 GPIO.output(PIN_STEP_MOT3, GPIO.LOW)
-
-# mm from top
-z_home = -181.5926
-
-try:
-    while True:
-        x = float(input('x:'))
-        y = float(input('y:'))
-        z = float(input('z:'))
-        z += z_home
-
-        # operations
-        (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
-        if not err:
-            drive.drive_motors(deg1, deg2, deg3)
-
-except KeyboardInterrupt:
-    print('\nterminating...')
-    GPIO.cleanup()
-    sys.exit()
 
