@@ -32,20 +32,23 @@ GPIO.output(PIN_STEP_MOT2, GPIO.LOW)
 GPIO.output(PIN_DIR_MOT3, GPIO.LOW)
 GPIO.output(PIN_STEP_MOT3, GPIO.LOW)
 
+# expected to be homed when startup
+deg1_last, deg2_last, deg3_last = 0, 0, 0
+
 # mm from top
 z_home = -181.5926
 
 try:
     while True:
-        x = float(input('x:'))
-        y = float(input('y:'))
-        z = float(input('z:'))
-        z += z_home
+        x_in = float(input('x:'))
+        y_in = float(input('y:'))
+        z_in = float(input('z:'))
+        z_in += z_home
 
         # operations
-        (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
+        (err, deg1, deg2, deg3) = kinematics.inverse(x_in, y_in, z_in)
         if not err:
-            drive.drive_motors(deg1, deg2, deg3)
+            drive.drive_motors(deg1 - deg1_last, deg2 - deg2_last, deg3 - deg3_last)
 
 except KeyboardInterrupt:
     print('\nterminating...')
