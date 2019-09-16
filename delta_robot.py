@@ -49,9 +49,14 @@ try:
         (err, deg1, deg2, deg3) = kinematics.inverse(x_in, y_in, z_in)
         if not err:
             drive.drive_motors(deg1 - deg1_last, deg2 - deg2_last, deg3 - deg3_last)
-            deg1_last = deg1 - deg1_last
-            deg2_last = deg2 - deg2_last
-            deg3_last = deg3 - deg3_last
+            #deg1_last = deg1 - deg1_last
+            #deg2_last = deg2 - deg2_last
+            #deg3_last = deg3 - deg3_last
+            deg1_last = deg1
+            deg2_last = deg2
+            deg3_last = deg3
+            print('{}, {}, {}'.format(deg1, deg2, deg3))
+            print('{}, {}, {}'.format(deg1_last, deg2_last, deg3_last))
 
 except KeyboardInterrupt:
     print('\nterminating...')
