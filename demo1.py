@@ -47,18 +47,22 @@ def move(x, y, z):
         deg2_last = deg2
         deg3_last = deg3
 
-n_repeat = 3
+n_repeat = 2
 
 for x in range(n_repeat):
-    move(0, 0, -50)
+    move(0, 0, -30)
     sleep(0.5)
-    move(40, 40, -50)
+    move(0, 10, -30)
     sleep(0.5)
-    move(40, -40, -50)
+    move(10, 10, -30)
     sleep(0.5)
-    move(-40, -40, -50)
+    move(10, -10, -30)
     sleep(0.5)
-    move(-40, 40, -50)
+    move(-10, -10, -30)
+    sleep(0.5)
+    move(-10, 10, -30)
+    sleep(0.5)
+    move(0, 10, -30)
     sleep(0.5)
     move(0, 0, 0)
     sleep(2)
