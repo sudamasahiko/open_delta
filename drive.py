@@ -3,8 +3,8 @@ from time import sleep
 import RPi.GPIO as GPIO
 
 # pins
-PIN_DIR_MOT1 = 2
-PIN_STEP_MOT1 = 3
+PIN_DIR_MOT1 = 27
+PIN_STEP_MOT1 = 17
 PIN_DIR_MOT2 = 10
 PIN_STEP_MOT2 = 22
 PIN_DIR_MOT3 = 13

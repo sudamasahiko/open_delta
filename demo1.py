@@ -9,12 +9,13 @@ import sys
 from time import sleep
 
 # pins
-PIN_DIR_MOT1 = 2
-PIN_STEP_MOT1 = 3
+PIN_DIR_MOT1 = 27
+PIN_STEP_MOT1 = 17
 PIN_DIR_MOT2 = 10
 PIN_STEP_MOT2 = 22
 PIN_DIR_MOT3 = 13
 PIN_STEP_MOT3 = 6
+PIN_ENABLE = 26
 
 # setting up GPIO pins
 GPIO.setmode(GPIO.BCM)
@@ -24,6 +25,7 @@ GPIO.setup(PIN_DIR_MOT2, GPIO.OUT)
 GPIO.setup(PIN_STEP_MOT2, GPIO.OUT)
 GPIO.setup(PIN_DIR_MOT3, GPIO.OUT)
 GPIO.setup(PIN_STEP_MOT3, GPIO.OUT)
+GPIO.setup(PIN_ENABLE, GPIO.OUT)
 
 # init GPIO pins
 GPIO.output(PIN_DIR_MOT1, GPIO.LOW)
@@ -32,6 +34,7 @@ GPIO.output(PIN_DIR_MOT2, GPIO.LOW)
 GPIO.output(PIN_STEP_MOT2, GPIO.LOW)
 GPIO.output(PIN_DIR_MOT3, GPIO.LOW)
 GPIO.output(PIN_STEP_MOT3, GPIO.LOW)
+GPIO.output(PIN_ENABLE, GPIO.LOW)
 
 # expected to be homed when startup
 deg1_last, deg2_last, deg3_last = 0, 0, 0
