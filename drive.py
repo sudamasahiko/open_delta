@@ -23,23 +23,6 @@ SPR = 360 / DEG_PER_STEP
 CW = 1
 CCW = 0
 
-# setting up GPIO pins
-# GPIO.setmode(GPIO.BCM)
-# GPIO.setup(PIN_DIR_MOT1, GPIO.OUT)
-# GPIO.setup(PIN_STEP_MOT1, GPIO.OUT)
-# GPIO.setup(PIN_DIR_MOT2, GPIO.OUT)
-# GPIO.setup(PIN_STEP_MOT2, GPIO.OUT)
-# GPIO.setup(PIN_DIR_MOT3, GPIO.OUT)
-# GPIO.setup(PIN_STEP_MOT3, GPIO.OUT)
-
-# init GPIO pins
-# GPIO.output(PIN_DIR_MOT1, GPIO.LOW)
-# GPIO.output(PIN_STEP_MOT1, GPIO.LOW)
-# GPIO.output(PIN_DIR_MOT2, GPIO.LOW)
-# GPIO.output(PIN_STEP_MOT2, GPIO.LOW)
-# GPIO.output(PIN_DIR_MOT3, GPIO.LOW)
-# GPIO.output(PIN_STEP_MOT3, GPIO.LOW)
-
 # parameter check
 def arg_to_steps(arg):
     raw_angle = float(arg)
