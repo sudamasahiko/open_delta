@@ -9,12 +9,12 @@ import sys
 from time import sleep
 
 # pins
-PIN_DIR_MOT1 = 20
-PIN_STEP_MOT1 = 21
-PIN_DIR_MOT2 = 5
-PIN_STEP_MOT2 = 6
+PIN_DIR_MOT1 = 2
+PIN_STEP_MOT1 = 3
+PIN_DIR_MOT2 = 10
+PIN_STEP_MOT2 = 22
 PIN_DIR_MOT3 = 13
-PIN_STEP_MOT3 = 19
+PIN_STEP_MOT3 = 6
 
 # setting up GPIO pins
 GPIO.setmode(GPIO.BCM)
@@ -40,6 +40,10 @@ deg1_last, deg2_last, deg3_last = 0, 0, 0
 z_home = -181.5926
 
 def move(x, y, z):
+    global deg1_last
+    global deg2_last
+    global deg3_last
+    z += z_home
     (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
     if not err:
         drive.drive_motors(deg1 - deg1_last, deg2 - deg2_last, deg3 - deg3_last)
