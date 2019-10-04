@@ -17,27 +17,46 @@ def get_last_det():
     conn.close
     return (x, y, w, h)
 
-def ViewWorldTransforma(x_obj, y_obj, w_obj, h_obj):
+# v1
+# def ViewWorldTransforma(x_obj, y_obj, w_obj, h_obj):
+# 
+#     # constants
+#     W_VIEW = 640
+#     H_VIEW = 480
+#     Y_RAD_START = 0.2
+#     Y_RAD_CONST = 0.94
+#     Y_RAD_SIZE = -3.0
+#     X_RAD_SIZE = -2.0
+#     
+#     center_x_view = ((x_obj + 0.5 * w_obj) / W_VIEW - 0.5) * 2
+#     center_y_view = 1.0 - (y_obj + 0.5 * h_obj) / H_VIEW
+#     
+#     y_world = 7.8 - 10.7 * center_y_view\
+#         + Y_RAD_SIZE * math.tan(Y_RAD_START + Y_RAD_CONST * center_y_view)
+#     x_additional = X_RAD_SIZE * math.tan(Y_RAD_START + Y_RAD_CONST * center_y_view)
+#     x_world = -7.2 * center_x_view + x_additional * center_x_view
+#     return x_world, y_world
+
+# v2
+def ViewWorldTransforma(x_target, y_target, w_obj, h_obj):
 
     # constants
-    W_VIEW = 640
-    H_VIEW = 480
-    Y_RAD_START = 0.2
-    Y_RAD_CONST = 0.94
-    Y_RAD_SIZE = -3.0
-    X_RAD_SIZE = -2.0
+    w_disp = 640
+    h_disp = 480
+    THETA_START = 0.20101055250063418
+    THETA_CAMERA = 40.6204018472511
+    Z = 22.665998826723097
+    Y_START = -7.979529824079942
+    X_PERS = 3.6
+    W_TRUE_BOTTOM = 19.5
+    Y_TOP = 11.6
+    Y_BUTTOM = -7.9
     
-    center_x_view = ((x_obj + 0.5 * w_obj) / W_VIEW - 0.5) * 2
-    center_y_view = 1.0 - (y_obj + 0.5 * h_obj) / H_VIEW
-    
-    y_world = 7.8 - 10.7 * center_y_view\
-        + Y_RAD_SIZE * math.tan(Y_RAD_START + Y_RAD_CONST * center_y_view)
-    x_additional = X_RAD_SIZE * math.tan(Y_RAD_START + Y_RAD_CONST * center_y_view)
-    x_world = -7.2 * center_x_view + x_additional * center_x_view
-    return x_world, y_world
-
-#x, y, w, h = get_last_det()
-#x_world, y_world = ViewWorldTransforma(x, y, w, h)
-#print(x_world)
-#print(y_world)
-
+    y_norm = y_target / h_disp
+    y_real = Y_START + Z * math.tan(math.radians(THETA_START + y_norm * THETA_CAMERA))
+    h_real = Y_TOP - Y_BUTTOM
+    w_additional = X_PERS * (y_real - Y_BUTTOM) / h_real
+    if x_target - 0.5 * w_disp < 0:
+        w_additional *= -1
+    x_real = (0.5 * W_TRUE_BOTTOM + w_additional) * (x_target - 0.5 * w_disp) / (0.5 * w_disp)
+    return x_real, y_real

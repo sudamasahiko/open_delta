@@ -44,12 +44,15 @@ GPIO.output(PIN_STEP_MOT3, GPIO.LOW)
 GPIO.output(PIN_ENABLE, GPIO.LOW)
 
 # expected to be homed when startup
-deg1_last, deg2_last, deg3_last = 0, 0, 0
+deg1_last = 21.5
+deg2_last = 21.5
+deg3_last = 21.5
 
 # mm from top
 #z_home = -181.5926
 #z_home = -277.129
-z_home = -280
+#z_home = -280
+z_home = -352.323
 
 def rotate_servo(servo, angle):
     #   0度の位置 0.5 ms / 20 ms * 100 = 2.5 %
@@ -81,26 +84,39 @@ def move(x, y, z):
     global deg2_last
     global deg3_last
     z += z_home
+    y *= -1
+    x *= -1
     (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
     if not err:
         drive.drive_motors(deg1 - deg1_last, deg2 - deg2_last, deg3 - deg3_last)
         deg1_last = deg1
         deg2_last = deg2
         deg3_last = deg3
+
 try:
-    pass
-    #x, y, w, h = dbconn.get_last_det()
-    #x_world, y_world = dbconn.ViewWorldTransforma(x, y, w, h)
+    #pass
+    x, y, w, h = dbconn.get_last_det()
+    x_world, y_world = dbconn.ViewWorldTransforma(x, y, w, h)
+    print('target: [{}, {}]'.format(x_world, y_world))
 except:
     print('db connection failed.')
     pass
 
-move(0, 0, 40)
+move(0, 0, 30)
+print('1: {}, 2: {}, 3: {}'.format(deg1_last, deg2_last, deg3_last))
 sleep(1)
-servo_open();
+
+move(0, 50, 30)
+print('1: {}, 2: {}, 3: {}'.format(deg1_last, deg2_last, deg3_last))
 sleep(1)
-servo_close();
-move(0, 0, 10)
+
+move(0, 0, 30)
+print('1: {}, 2: {}, 3: {}'.format(deg1_last, deg2_last, deg3_last))
+sleep(1)
+
+move(0, 0, 2)
+print('1: {}, 2: {}, 3: {}'.format(deg1_last, deg2_last, deg3_last))
+sleep(1)
 
 #move(0, 10, 30)
 #sleep(0.5)
