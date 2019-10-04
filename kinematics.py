@@ -9,8 +9,10 @@ import math
 # e and f are side lengths
 e  =  96.9948
 f  =  214.0
-re = 231.0
-rf =  109.0
+re = 350.0
+rf =  180.0
+#re = 231.0
+#rf =  109.0
 
 # Trigonometric constants
 s      = 165 * 2

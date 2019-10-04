@@ -39,7 +39,8 @@ GPIO.output(PIN_ENABLE, GPIO.LOW)
 deg1_last, deg2_last, deg3_last = 0, 0, 0
 
 # mm from top
-z_home = -181.5926
+# z_home = -181.5926
+z_home = -275
 
 try:
     while True:
