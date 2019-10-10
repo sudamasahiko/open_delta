@@ -6,10 +6,11 @@
 # license: MIT LICENSE
 
 import kinematics, drive
-import RPi.GPIO as GPIO
 import sys
 from time import sleep
 import dbconn
+#import RPi.GPIO as GPIO
+import pigpio
 
 # pins
 PIN_DIR_MOT1 = 27
@@ -23,25 +24,36 @@ PIN_SERVO = 14
 PIN_BUTTON = 4
 
 # setting up GPIO pins
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(PIN_DIR_MOT1, GPIO.OUT)
-GPIO.setup(PIN_STEP_MOT1, GPIO.OUT)
-GPIO.setup(PIN_DIR_MOT2, GPIO.OUT)
-GPIO.setup(PIN_STEP_MOT2, GPIO.OUT)
-GPIO.setup(PIN_DIR_MOT3, GPIO.OUT)
-GPIO.setup(PIN_STEP_MOT3, GPIO.OUT)
-GPIO.setup(PIN_ENABLE, GPIO.OUT)
-GPIO.setup(PIN_SERVO, GPIO.OUT)
-GPIO.setup(PIN_BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# GPIO.setmode(GPIO.BCM)
+# GPIO.setup(PIN_DIR_MOT1, GPIO.OUT)
+# GPIO.setup(PIN_STEP_MOT1, GPIO.OUT)
+# GPIO.setup(PIN_DIR_MOT2, GPIO.OUT)
+# GPIO.setup(PIN_STEP_MOT2, GPIO.OUT)
+# GPIO.setup(PIN_DIR_MOT3, GPIO.OUT)
+# GPIO.setup(PIN_STEP_MOT3, GPIO.OUT)
+# GPIO.setup(PIN_ENABLE, GPIO.OUT)
+# GPIO.setup(PIN_SERVO, GPIO.OUT)
+# GPIO.setup(PIN_BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+pi = pigpio.pi()
+pi.set_mode(PIN_DIR_MOT1, pigpio.OUTPUT)
+pi.set_mode(PIN_STEP_MOT1, pigpio.OUTPUT)
+pi.set_mode(PIN_DIR_MOT2, pigpio.OUTPUT)
+pi.set_mode(PIN_STEP_MOT2, pigpio.OUTPUT)
+pi.set_mode(PIN_DIR_MOT3, pigpio.OUTPUT)
+pi.set_mode(PIN_STEP_MOT3, pigpio.OUTPUT)
+pi.set_mode(PIN_ENABLE, pigpio.OUTPUT)
+pi.set_mode(PIN_SERVO, pigpio.OUTPUT)
+pi.set_mode(PIN_BUTTON, pigpio.INPUT)
 
 # init GPIO pins
-GPIO.output(PIN_DIR_MOT1, GPIO.LOW)
-GPIO.output(PIN_STEP_MOT1, GPIO.LOW)
-GPIO.output(PIN_DIR_MOT2, GPIO.LOW)
-GPIO.output(PIN_STEP_MOT2, GPIO.LOW)
-GPIO.output(PIN_DIR_MOT3, GPIO.LOW)
-GPIO.output(PIN_STEP_MOT3, GPIO.LOW)
-GPIO.output(PIN_ENABLE, GPIO.LOW)
+pi.write(PIN_DIR_MOT1, 0)
+pi.write(PIN_STEP_MOT1, 0)
+pi.write(PIN_DIR_MOT2, 0)
+pi.write(PIN_STEP_MOT2, 0)
+pi.write(PIN_DIR_MOT3, 0)
+pi.write(PIN_STEP_MOT3, 0)
+pi.write(PIN_ENABLE, 0)
 
 # expected to be homed when startup
 deg1_last = 21.5
@@ -66,18 +78,20 @@ def rotate_servo(servo, angle):
         raise ValueError("angle")
 
 def servo_close():
-    pwm = GPIO.PWM(PIN_SERVO, 50)
-    pwm.start(0.0)
-    rotate_servo(pwm, 60)
-    sleep(0.5)
-    pwm.stop()
+    pass
+    #pwm = GPIO.PWM(PIN_SERVO, 50)
+    #pwm.start(0.0)
+    #rotate_servo(pwm, 60)
+    #sleep(0.5)
+    #pwm.stop()
 
 def servo_open():
-    pwm = GPIO.PWM(PIN_SERVO, 50)
-    pwm.start(0.0)
-    rotate_servo(pwm, 20)
-    sleep(0.5)
-    pwm.stop()
+    pass
+    #pwm = GPIO.PWM(PIN_SERVO, 50)
+    #pwm.start(0.0)
+    #rotate_servo(pwm, 20)
+    #sleep(0.5)
+    #pwm.stop()
 
 def move(x, y, z):
     global deg1_last
@@ -102,15 +116,15 @@ except:
     print('db connection failed.')
     pass
 
-move(0, 0, 30)
+move(0, 0, 50)
 print('1: {}, 2: {}, 3: {}'.format(deg1_last, deg2_last, deg3_last))
 sleep(1)
 
-move(0, 50, 30)
+move(0, 90, 50)
 print('1: {}, 2: {}, 3: {}'.format(deg1_last, deg2_last, deg3_last))
 sleep(1)
 
-move(0, 0, 30)
+move(0, 0, 50)
 print('1: {}, 2: {}, 3: {}'.format(deg1_last, deg2_last, deg3_last))
 sleep(1)
 
@@ -133,5 +147,7 @@ sleep(1)
 #move(0, 0, 0)
 #sleep(2)
 
-GPIO.cleanup()
+# GPIO.cleanup()
+pi.write(PIN_ENABLE, 1)
+pi.stop()
 

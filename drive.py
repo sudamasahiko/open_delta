@@ -1,6 +1,9 @@
 import sys, threading
 from time import sleep
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
+import pigpio
+
+pi = pigpio.pi()
 
 # pins
 PIN_DIR_MOT1 = 27
@@ -11,12 +14,12 @@ PIN_DIR_MOT3 = 13
 PIN_STEP_MOT3 = 6
 
 # NEMA17
-# STEP_RESOLUTION = 1
-STEP_RESOLUTION = 16 # MODE pins are all HIGH
+# STEP_RESOLUTION = 16 # MODE pins are all HIGH
+STEP_RESOLUTION = 8 # HHL
 DEG_PER_STEP = 1.8 / STEP_RESOLUTION
-DELAY_PER_STEP = 0.024
+DELAY_PER_STEP = 0.012
 # DELAY_PER_STEP = 0.006 # 100RPM
-# DELAY_PER_STEP = 0.048 # 12.5RPM
+# DELAY_PER_STEP = 0.
 
 # other constants
 SPR = 360 / DEG_PER_STEP
@@ -45,14 +48,16 @@ def biggest(a, y, z):
 
 # rotate function
 def rotate(steps, direction, pin_dir, pin_step, span_delay):
+    print(span_delay)
     if not span_delay or not steps:
         return
 
-    GPIO.output(pin_dir, direction)
+    # GPIO.output(pin_dir, direction)
+    pi.write(pin_dir, direction)
     for x in range(steps):
-        GPIO.output(pin_step, GPIO.HIGH)
+        pi.write(pin_step, 1)
         sleep(span_delay)
-        GPIO.output(pin_step, GPIO.LOW)
+        pi.write(pin_step, 0)
         sleep(span_delay)
 
 def drive_motors(deg1, deg2, deg3):
@@ -96,4 +101,8 @@ def drive_motors(deg1, deg2, deg3):
     t1.join()
     t2.join()
     t3.join()
+
+    #rotate(s_m1, d_m1, PIN_DIR_MOT1, PIN_STEP_MOT1, DELAY_PER_STEP)
+    #rotate(s_m2, d_m2, PIN_DIR_MOT2, PIN_STEP_MOT2, DELAY_PER_STEP)
+    #rotate(s_m3, d_m3, PIN_DIR_MOT3, PIN_STEP_MOT3, DELAY_PER_STEP)
 

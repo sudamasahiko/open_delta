@@ -36,11 +36,12 @@ GPIO.output(PIN_STEP_MOT3, GPIO.LOW)
 GPIO.output(PIN_ENABLE, GPIO.LOW)
 
 # expected to be homed when startup
-deg1_last, deg2_last, deg3_last = 0, 0, 0
+deg1_last, deg2_last, deg3_last = 21.5, 21.5, 21.5
 
 # mm from top
 # z_home = -181.5926
-z_home = -275
+# z_home = -275
+z_home = -352.323
 
 try:
     while True:
