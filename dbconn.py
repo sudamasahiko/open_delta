@@ -1,4 +1,5 @@
-import time, math
+import time
+# import math
 import mysql.connector
 
 def get_last_det():
@@ -7,12 +8,15 @@ def get_last_det():
     conn = mysql.connector.connect(user='masahiko', password='ouse2007',
         host='169.254.9.245', database='plastic_ai')
     cur = conn.cursor()
-    query = '''SELECT time, x, y, w, h FROM detection 
-    ORDER BY time DESC limit 5;
+    query = '''SELECT time, x, y, w, h
+                 FROM detection 
+                 ORDER BY time DESC;
     '''
     cur.execute(query)
-    for row in cur.fetchall():
-        x, y, w, h = row[1], row[2], row[3], row[4]
+    #for row in cur.fetchall():
+    #    x, y, w, h = row[1], row[2], row[3], row[4]
+    row = cur.fetchone()
+    x, y, w, h = row[1], row[2], row[3], row[4]
     cur.close
     conn.close
     return (x, y, w, h)
@@ -38,25 +42,28 @@ def get_last_det():
 #     return x_world, y_world
 
 # v2
-def ViewWorldTransforma(x_target, y_target, w_obj, h_obj):
+# def ViewWorldTransforma(x_target, y_target, w_obj, h_obj):
+# 
+#     # constants
+#     w_disp = 640
+#     h_disp = 480
+#     THETA_START = 0.20101055250063418
+#     THETA_CAMERA = 40.6204018472511
+#     Z = 22.665998826723097
+#     Y_START = -7.979529824079942
+#     X_PERS = 3.6
+#     W_TRUE_BOTTOM = 19.5
+#     Y_TOP = 11.6
+#     Y_BUTTOM = -7.9
+#     
+#     y_norm = y_target / float(h_disp)
+#     print 'y_target: {}'.format(y_target)
+#     print 'y_norm: {}'.format(y_norm)
+#     y_real = Y_START + Z * math.tan(math.radians(THETA_START + y_norm * THETA_CAMERA))
+#     h_real = Y_TOP - Y_BUTTOM
+#     w_additional = X_PERS * (y_real - Y_BUTTOM) / h_real
+#     if x_target - 0.5 * w_disp < 0:
+#         w_additional *= -1
+#     x_real = (0.5 * W_TRUE_BOTTOM + w_additional) * (x_target - 0.5 * w_disp) / (0.5 * w_disp)
+#     return x_real, y_real
 
-    # constants
-    w_disp = 640
-    h_disp = 480
-    THETA_START = 0.20101055250063418
-    THETA_CAMERA = 40.6204018472511
-    Z = 22.665998826723097
-    Y_START = -7.979529824079942
-    X_PERS = 3.6
-    W_TRUE_BOTTOM = 19.5
-    Y_TOP = 11.6
-    Y_BUTTOM = -7.9
-    
-    y_norm = y_target / h_disp
-    y_real = Y_START + Z * math.tan(math.radians(THETA_START + y_norm * THETA_CAMERA))
-    h_real = Y_TOP - Y_BUTTOM
-    w_additional = X_PERS * (y_real - Y_BUTTOM) / h_real
-    if x_target - 0.5 * w_disp < 0:
-        w_additional *= -1
-    x_real = (0.5 * W_TRUE_BOTTOM + w_additional) * (x_target - 0.5 * w_disp) / (0.5 * w_disp)
-    return x_real, y_real

@@ -65,6 +65,18 @@ def set_angle(idx_motor, angle):
         pwm.set_pwm(ports[idx_motor], 0, get_pulse(computed))
         time.sleep(DELAY_STEP)
 
+def set_angle_no_easing(idx_motor, angle):
+    resolution = 20
+    for i in range(resolution):
+        ratio = float(i+1) / resolution
+        computed = calib[idx_motor] - angles_now[idx_motor] - ratio * (angle-angles_now[idx_motor])
+        pwm.set_pwm(ports[idx_motor], 0, get_pulse(computed))
+        time.sleep(DELAY_STEP)
+
+# def set_angle_no_easing(idx_motor, angle):
+#     computed = calib[idx_motor] - angles_now[idx_motor] - angle-angles_now[idx_motor]
+#     pwm.set_pwm(ports[idx_motor], 0, get_pulse(computed))
+
 def drive_motors(angles):
     global angles_now
     t1 = threading.Thread(target=set_angle, args=(0, angles[0]))
@@ -79,7 +91,21 @@ def drive_motors(angles):
     angles_now[0] = angles[0]
     angles_now[1] = angles[1]
     angles_now[2] = angles[2]
-    time.sleep(1)
+
+def drive_motors_no_easing(angles):
+    global angles_now
+    t1 = threading.Thread(target=set_angle_no_easing, args=(0, angles[0]))
+    t2 = threading.Thread(target=set_angle_no_easing, args=(1, angles[1]))
+    t3 = threading.Thread(target=set_angle_no_easing, args=(2, angles[2]))
+    t1.start()
+    t2.start()
+    t3.start()
+    t1.join()
+    t2.join()
+    t3.join()
+    angles_now[0] = angles[0]
+    angles_now[1] = angles[1]
+    angles_now[2] = angles[2]
 
 def checkpoint():
     global angles_now
