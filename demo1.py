@@ -40,20 +40,8 @@ for param in params:
 # View-world Transformation
 def VWT(x_target, y_target, w_obj, h_obj):
     global params
-
-    # constants
-    # w_disp = 640
-    # h_disp = 480
-    # THETA_START = 0.20101055250063418
-    # THETA_CAMERA = 40.6204018472511
-    # Z = 22.665998826723097
-    # Y_START = -7.979529824079942
-    # X_PERS = 3.6
-    # W_TRUE_BOTTOM = 19.5
-
     Y_TOP = params['y1_true']
     Y_BOTTOM = params['y3_true']
-    
     y_norm = y_target / float(params['h_disp'])
     y_real = params['y_start'] + params['z'] * math.tan(math.radians(params['theta_start'] + y_norm * params['theta_camera']))
     h_real = Y_TOP - Y_BOTTOM
@@ -64,81 +52,101 @@ def VWT(x_target, y_target, w_obj, h_obj):
     return x_real, y_real
 
 def rotate_servo(servo, angle):
-    #   0度の位置 0.5 ms / 20 ms * 100 = 2.5 %
-    # 180度の位置 2.4 ms / 20 ms * 100 = 12 %
-    #      変動幅 12% - 2.5% (9.5%)
-    # angle * 9.5 / 180
     if -90 <= angle <= 90:
         d = ((angle + 90) * 9.5 / 180) + 2.5
         servo.ChangeDutyCycle(d)
     else:
         raise ValueError("angle")
 
-def servo_close():
+def servo_close(angle=30, wait=0.5):
     pwm = GPIO.PWM(PIN_SERVO, 50)
     pwm.start(0.0)
-    rotate_servo(pwm, 40)
-    sleep(0.5)
+    rotate_servo(pwm, angle)
+    sleep(wait)
     pwm.stop()
 
-def servo_open():
+def servo_open(wait=0.5):
     pwm = GPIO.PWM(PIN_SERVO, 50)
     pwm.start(0.0)
     rotate_servo(pwm, 0)
-    sleep(0.5)
+    sleep(wait)
     pwm.stop()
 
 def move(x, y, z):
-    # todo add param limit??
     z += z_home
-    # y *= -1
     x *= -1
     (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
     if not err:
         drive2.drive_motors((deg1, deg2, deg3))
 
 def move_no_easing(x, y, z):
-    # todo add param limit??
     z += z_home
-    # y *= -1
     x *= -1
     (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
     if not err:
         drive2.drive_motors_no_easing((deg1, deg2, deg3))
 
+def maneuver():
+    is_outside = False
+    try:
+        x, y, w, h = dbconn.get_last_det()
+    except:
+        print 'db connection failed.'
+        import traceback
+        traceback.print_exc()
+
+    try:
+        x_world, y_world = VWT(x, y, w, h)
+        print 'target: [{:.2f}, {:.2f}]'.format(x_world, y_world)
+    except:
+        import traceback
+        traceback.print_exc()
+
+    limit = 100.0
+    if abs(x_world) > limit or abs(y_world) > limit:
+        is_outside = True
+
+    if not is_outside:
+        z_target = 15
+
+
+        is_target_stays = True
+        cnt = 0
+        cnt_try = 5
+        grip_anble_base = 40
+        while is_target_stays and cnt < cnt_try:
+            cnt += 1
+            move(10 * x_world, 10 * y_world, z_target)
+
+            # grip size will become stronger
+            servo_close(grip_anble_base)
+            servo_open()
+            servo_close(grip_anble_base)
+            servo_open()
+            grip_angle = grip_anble_base + cnt * 2
+            servo_close(grip_angle)
+
+            # lift and check
+            move(0, 0, 120)
+            t_window = 2
+            sleep(t_window)
+            dbconn.flush()
+            t_since = int(time.time()) - t_window
+            if not dbconn.in_db(t_since, x, y, w, h):
+                is_target_stays = False
+                move(0, 80, 120)
+                servo_open()
+                move(0, 0, 120)
+            else:
+                servo_open()
+
+        drive2.checkpoint()
+
 try:
     while True:
         if GPIO.input(PIN_BUTTON) == GPIO.LOW:
+            maneuver()
 
-            is_outside = False
-            try:
-                x, y, w, h = dbconn.get_last_det()
-            except:
-                print 'db connection failed.'
-            
-            try:
-                x_world, y_world = VWT(x, y, w, h)
-                print 'target: [{}, {}]'.format(x_world, y_world)
-            except:
-                print 'error during transformation'
-
-            if abs(x_world) > 100 or abs(y_world) > 100:
-                is_outside = True 
-
-            if not is_outside: 
-                z_target = 15
-                move(10 * x_world, 10 * y_world, z_target)
-    
-                servo_close()
-                servo_open()
-                servo_close()
-                servo_open()
-    
-                # homing
-                move(0, 0, 120)
-    
-                drive2.checkpoint()
-            
 except KeyboardInterrupt:
     GPIO.cleanup()
 
