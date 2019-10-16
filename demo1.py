@@ -6,17 +6,10 @@
 # license: MIT LICENSE
 
 import kinematics, dbconn, drive2
-from time import sleep
-import math, json
+import math, json, time
 import RPi.GPIO as GPIO
 
 # pins
-PIN_DIR_MOT1 = 27
-PIN_STEP_MOT1 = 17
-PIN_DIR_MOT2 = 10
-PIN_STEP_MOT2 = 22
-PIN_DIR_MOT3 = 13
-PIN_STEP_MOT3 = 6
 PIN_SERVO = 14
 PIN_BUTTON = 4
 
@@ -26,7 +19,8 @@ GPIO.setup(PIN_SERVO, GPIO.OUT)
 GPIO.setup(PIN_BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # mm from top
-z_home = -352.323
+# z_home = -352.323
+z_home = -380.0
 
 # load saved parameters
 fn = 'camera_params.json'
@@ -62,38 +56,39 @@ def servo_close(angle=30, wait=0.5):
     pwm = GPIO.PWM(PIN_SERVO, 50)
     pwm.start(0.0)
     rotate_servo(pwm, angle)
-    sleep(wait)
+    time.sleep(wait)
     pwm.stop()
 
 def servo_open(wait=0.5):
     pwm = GPIO.PWM(PIN_SERVO, 50)
     pwm.start(0.0)
     rotate_servo(pwm, 0)
-    sleep(wait)
+    time.sleep(wait)
     pwm.stop()
 
 def move(x, y, z):
     z += z_home
     x *= -1
+    # x -= 1 # adjustment
     (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
     if not err:
         drive2.drive_motors((deg1, deg2, deg3))
 
-def move_no_easing(x, y, z):
-    z += z_home
-    x *= -1
-    (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
-    if not err:
-        drive2.drive_motors_no_easing((deg1, deg2, deg3))
+# def move_no_easing(x, y, z):
 
-def maneuver():
+def get_target():
     is_outside = False
     try:
         x, y, w, h = dbconn.get_last_det()
+        print 'last det in db, x: {}, y: {}, w: {}, h: {}'.format(x, y, w, h)
     except:
         print 'db connection failed.'
         import traceback
         traceback.print_exc()
+        return x, y, w, h, None, None
+
+    if x == None or y == None:
+        return x, y, w, h, None, None
 
     try:
         x_world, y_world = VWT(x, y, w, h)
@@ -101,46 +96,55 @@ def maneuver():
     except:
         import traceback
         traceback.print_exc()
+        return x, y, w, h, None, None
 
     limit = 100.0
     if abs(x_world) > limit or abs(y_world) > limit:
         is_outside = True
-
+    
     if not is_outside:
-        z_target = 15
+        return x, y, w, h, x_world, y_world
+    else:
+        return x, y, w, h, None, None
 
+def maneuver():
+    z_target = 10
+    is_target_stays = True
+    cnt = 0
+    cnt_try = 4
+    grip_anble_base = 53
+    while is_target_stays and cnt < cnt_try:
 
-        is_target_stays = True
-        cnt = 0
-        cnt_try = 5
-        grip_anble_base = 40
-        while is_target_stays and cnt < cnt_try:
-            cnt += 1
-            move(10 * x_world, 10 * y_world, z_target)
+        x, y, w, h, x_world, y_world = get_target()
+        if not x_world or not y_world:
+            print 'no target detected'
+            return
 
-            # grip size will become stronger
-            servo_close(grip_anble_base)
+        cnt += 1
+        move(10 * x_world, 10 * y_world, z_target)
+
+        # grip size will become stronger
+        # servo_close(grip_anble_base)
+        # servo_open()
+        grip_angle = grip_anble_base + cnt * 7
+        servo_close(grip_angle)
+
+        # lift and check
+        move(0, 0, 120)
+        time.sleep(1)
+        dbconn.flush()
+        t_window = 3
+        time.sleep(t_window)
+        if not dbconn.in_db(x, y, w, h):
+            is_target_stays = False
+            move(80, -80, 120)
             servo_open()
-            servo_close(grip_anble_base)
-            servo_open()
-            grip_angle = grip_anble_base + cnt * 2
-            servo_close(grip_angle)
-
-            # lift and check
             move(0, 0, 120)
-            t_window = 2
-            sleep(t_window)
-            dbconn.flush()
-            t_since = int(time.time()) - t_window
-            if not dbconn.in_db(t_since, x, y, w, h):
-                is_target_stays = False
-                move(0, 80, 120)
-                servo_open()
-                move(0, 0, 120)
-            else:
-                servo_open()
+        else:
+            move(0, 0, 120)
+            servo_open()
 
-        drive2.checkpoint()
+    drive2.checkpoint()
 
 try:
     while True:
@@ -148,7 +152,7 @@ try:
             maneuver()
 
 except KeyboardInterrupt:
+    servo_open()
+    move(0, 0, 120)
     GPIO.cleanup()
-
-GPIO.cleanup()
 

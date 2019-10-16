@@ -16,6 +16,8 @@ for k,v in params.items():
     print '{}: {}'.format(k, v)
 
 def calc_loss(theta_start_in, theta_camera_in, z_in, y_start_in, fac):
+    global params
+
     rand0 = fac * (random.random() - 0.5)
     rand1 = fac * (random.random() - 0.5)
     rand2 = fac * (random.random() - 0.5)
@@ -28,9 +30,9 @@ def calc_loss(theta_start_in, theta_camera_in, z_in, y_start_in, fac):
     y1 = y_start + z * math.tan(math.radians(theta_start + theta_camera))
     y2 = y_start + z * math.tan(math.radians(theta_start + 0.5 * theta_camera))
     y3 = y_start + z * math.tan(math.radians(theta_start))
-    y1_true = 11.6
-    y2_true = 0.5
-    y3_true = -7.9
+    y1_true = params['y1_true']
+    y2_true = params['y2_true']
+    y3_true = params['y3_true']
     loss = math.pow(y1 - y1_true, 2) + math.pow(y2 - y2_true, 2) + math.pow(y3 - y3_true, 2)
     return loss, theta_start, theta_camera, z, y_start
 
@@ -70,6 +72,7 @@ for i in range(n_epoch):
     theta_start, theta_camera, z, y_start = children[0].theta_start, children[0].theta_camera, children[0].z, children[0].y_start
     if i == 0:
         print ''
+        print 'worst child: loss: {}'.format(children[len(children)-1].loss)
     if i % 500 == 0:
         print 'epoch: {}, loss: {}'.format(i, children[0].loss)
 

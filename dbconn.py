@@ -8,7 +8,7 @@ DB = 'plastic_ai'
 
 def get_last_det():
     now = (int)(time.time())
-    sec_window = 6000
+    sec_window = 10
     conn = mysql.connector.connect(user=USR, password=PWD, host=HOST, database=DB)
     cur = conn.cursor()
     query = '''SELECT time, x, y, w, h
@@ -19,9 +19,12 @@ def get_last_det():
     #for row in cur.fetchall():
     #    x, y, w, h = row[1], row[2], row[3], row[4]
     row = cur.fetchone()
-    x, y, w, h = row[1], row[2], row[3], row[4]
     cur.close
     conn.close
+    try:
+        x, y, w, h = row[1], row[2], row[3], row[4]
+    except:
+        x, y, w, h = None, None, None, None
     return (x, y, w, h)
 
 # delete everything
@@ -30,24 +33,30 @@ def flush():
     cur = conn.cursor()
     query = 'DELETE FROM detection;'
     cur.execute(query)
+    conn.commit()
     cur.close
     conn.close
 
-def in_db(t_since, x, y, w, h):
+def in_db(x, y, w, h):
     conn = mysql.connector.connect(user=USR, password=PWD, host=HOST, database=DB)
     cur = conn.cursor()
-    query = '''SELECT COUNT(1) FROM detection
-      WHERE time > {} AND x > x-30 AND x < x+30
-        AND y > y-30 AND y < y+30
-        AND w > w-30 AND w < w+30
-        AND h > h-30 AND h < h+30
-      ;'''.format(t_since)
-        cur.execute(query)
-        row = cur.fetchone()
-        cnt = row[1]
-        cur.close
-        conn.close
-        if cnt > 0:
-            return True
-        else:
-            return False
+    query = '''SELECT x,y,w,h FROM detection
+      WHERE x > {} AND x < {}
+        AND y > {} AND y < {}
+      ;'''.format(x-90, x+90, y-90, y+90)
+    print(query)
+
+    # query = '''SELECT time,x,y,w,h FROM detection;'''
+
+    cur.execute(query)
+    rows = cur.fetchall()
+    # cnt = row[0]
+    cnt = len(rows)
+    print('cnt: {}'.format(len(rows)))
+    cur.close
+    conn.close
+    if cnt > 0:
+        return True
+    else:
+        return False
+
