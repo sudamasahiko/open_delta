@@ -1,21 +1,30 @@
 # drive2.py
+# 
+# usage: 
+# (C) Seltec Lab
 # License: MIT License
 
 import time, sys, math, threading, copy
 import RPi.GPIO as GPIO
 import Adafruit_PCA9685
 
-# constants for the motor
+# constants for PCA9685
 RESOLUTION = 4096
+PORT_MOTOR1 = 15
+PORT_MOTOR2 = 14
+PORT_MOTOR3 = 13
+
+# constants for a LD-25MG servo motor
 PULSE_WIDTH_MS = 20.0
 PULSE_FROM = RESOLUTION * 0.5 / PULSE_WIDTH_MS
 PULSE_TO = RESOLUTION * 2.5 / PULSE_WIDTH_MS
 RANGE_ANGLE = 180
-PORT_MOTOR1 = 15
-PORT_MOTOR2 = 14
-PORT_MOTOR3 = 13
+
+# constants for this program
 RESOLUTION_MOTOR = 100
 DELAY_STEP = 0.01
+
+# saved config values
 fn_calib = 'calibration.cfg'
 fn_angles = 'angles_last.cfg'
 
@@ -44,7 +53,6 @@ for line in lines:
     angles_last.append(float(line))
 
 # init
-# GPIO.setmode(GPIO.BOARD) # todo xxx should be removed?
 pwm = Adafruit_PCA9685.PCA9685()
 freq = int(1000 / PULSE_WIDTH_MS)
 pwm.set_pwm_freq(freq)
@@ -72,10 +80,6 @@ def set_angle_no_easing(idx_motor, angle):
         computed = calib[idx_motor] - angles_now[idx_motor] - ratio * (angle-angles_now[idx_motor])
         pwm.set_pwm(ports[idx_motor], 0, get_pulse(computed))
         time.sleep(DELAY_STEP)
-
-# def set_angle_no_easing(idx_motor, angle):
-#     computed = calib[idx_motor] - angles_now[idx_motor] - angle-angles_now[idx_motor]
-#     pwm.set_pwm(ports[idx_motor], 0, get_pulse(computed))
 
 def drive_motors(angles):
     global angles_now
@@ -114,5 +118,5 @@ def checkpoint():
             f.write('{}\n'.format(ang))
 
 # restore the saved angles
-drive_motors(angles_last)
+# drive_motors(angles_last)
 

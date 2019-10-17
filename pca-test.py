@@ -1,6 +1,7 @@
-# test3.py
-# usage python test3.py [angle]
-# 
+# pca-test.py
+# manually drive 3 servo motors
+# usage: python pca-test.py [angle] [angle] [angle]
+# (C) Seltec Lab
 # License: MIT License
 
 import time, sys, math, threading, copy
@@ -45,8 +46,6 @@ angles_last = []
 for line in lines:
     angles_last.append(float(line))
 
-# init
-# GPIO.setmode(GPIO.BOARD) # todo xxx should be removed?
 pwm = Adafruit_PCA9685.PCA9685()
 freq = int(1000 / PULSE_WIDTH_MS)
 pwm.set_pwm_freq(freq)
@@ -92,7 +91,7 @@ ang2 = float(sys.argv[2])
 ang3 = float(sys.argv[3])
 drive_motors((ang1, ang2, ang3))
 
-# todo xxx save present angles to the cfg file
+# save present angles to the cfg file
 with open(fn_angles, 'w') as f:
     for ang in angles_now:
         f.write('{}\n'.format(ang))
