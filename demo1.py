@@ -5,7 +5,7 @@
 # (C) Seltec Lab
 # license: MIT LICENSE
 
-import kinematics, dbconn, drive2
+import kinematics, dbconn, pca9685
 import math, json, time
 import RPi.GPIO as GPIO
 
@@ -72,7 +72,7 @@ def move(x, y, z):
     # x -= 1 # adjustment
     (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
     if not err:
-        drive2.drive_motors((deg1, deg2, deg3))
+        pca9685.drive_motors((deg1, deg2, deg3))
 
 # def move_no_easing(x, y, z):
 
@@ -144,7 +144,7 @@ def maneuver():
             move(0, 0, 120)
             servo_open()
 
-    drive2.checkpoint()
+    pca9685.checkpoint()
 
 try:
     while True:

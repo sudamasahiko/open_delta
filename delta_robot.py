@@ -1,9 +1,10 @@
 # delta_robot.py
+# interactive
 # usage: python delta_robot.py
 # (C) Seltec Lab
 # license: MIT LICENSE
 
-import kinematics, drive2
+import kinematics, pca9685
 import RPi.GPIO as GPIO
 import sys, json, math, time
 
@@ -39,7 +40,7 @@ def move(x, y, z):
     x -= 1 # adjustment
     (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
     if not err:
-        drive2.drive_motors((deg1, deg2, deg3))
+        pca9685.drive_motors((deg1, deg2, deg3))
 
 try:
     while True:
@@ -50,7 +51,8 @@ try:
         move(x_in, y_in, z_in)
 
 except KeyboardInterrupt:
-    print('\nterminating...')
+    print '\nhoming...'
     move(0, 0, 120)
+    print '\nterminating...'
     GPIO.cleanup()
 

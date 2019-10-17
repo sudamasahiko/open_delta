@@ -1,6 +1,5 @@
-# drive2.py
-# 
-# usage: 
+# pca9685.py
+# driver script for a servo driver PCA9685
 # (C) Seltec Lab
 # License: MIT License
 
