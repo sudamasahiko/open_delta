@@ -34,7 +34,7 @@ parser.add_argument('angle1', type=float)
 parser.add_argument('angle2', type=float)
 parser.add_argument('angle3', type=float)
 parser.add_argument('-e', '--easing', action='store_true')
-IS_EASEING = True if args.easing else IS_EASEING = False
+IS_EASEING = True if args.easing else False
 
 # calibration for the motors
 calib = []
