@@ -39,9 +39,9 @@ def VWT(x_target, y_target, w_obj, h_obj):
     y_norm = y_target / float(params['h_disp'])
     y_real = params['y_start'] + params['z'] * math.tan(math.radians(params['theta_start'] + y_norm * params['theta_camera']))
     h_real = Y_TOP - Y_BOTTOM
-    w_additional = params['x_pers'] * (y_real - Y_BOTTOM) / h_real
-    if x_target - 0.5 * params['w_disp'] < 0:
-        w_additional *= -1
+    w_additional = abs(params['x_pers'] * (y_real - Y_BOTTOM) / h_real)
+    #if x_target - 0.5 * params['w_disp'] < 0:
+    #    w_additional *= -1
     x_real = (0.5 * params['w_true_bottom'] + w_additional) * (x_target - 0.5 * params['w_disp']) / (0.5 * params['w_disp'])
     return x_real, y_real
 
@@ -108,7 +108,7 @@ def get_target():
         return x, y, w, h, None, None
 
 def maneuver():
-    z_target = 10
+    z_target = 20
     is_target_stays = True
     cnt = 0
     cnt_try = 4
@@ -121,7 +121,7 @@ def maneuver():
             return
 
         cnt += 1
-        move(10 * x_world, 10 * y_world, z_target)
+        move(10 * x_world, 10 * y_world, z_target - cnt*2)
 
         # grip size will become stronger
         # servo_close(grip_anble_base)
@@ -133,7 +133,7 @@ def maneuver():
         move(0, 0, 120)
         time.sleep(1)
         dbconn.flush()
-        t_window = 3
+        t_window = 1.5
         time.sleep(t_window)
         if not dbconn.in_db(x, y, w, h):
             is_target_stays = False

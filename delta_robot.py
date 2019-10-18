@@ -5,7 +5,6 @@
 # license: MIT LICENSE
 
 import kinematics, pca9685
-import RPi.GPIO as GPIO
 import sys, json, math, time
 
 # mm from top
@@ -41,18 +40,15 @@ def move(x, y, z):
     (err, deg1, deg2, deg3) = kinematics.inverse(x, y, z)
     if not err:
         pca9685.drive_motors((deg1, deg2, deg3))
+        pca9685.checkpoint()
 
 try:
     while True:
         x_in = float(input('x:'))
         y_in = float(input('y:'))
         z_in = float(input('z:'))
-        print 'target: [{:.2f}, {:.2f}, {:.2f}]'.format(x_in, y_in, z_in)
         move(x_in, y_in, z_in)
 
 except KeyboardInterrupt:
-    print '\nhoming...'
-    move(0, 0, 120)
-    print '\nterminating...'
-    GPIO.cleanup()
+    sys.exit()
 

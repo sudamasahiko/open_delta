@@ -21,7 +21,7 @@ RANGE_ANGLE = 180
 
 # constants for this program
 RESOLUTION_MOTOR = 100
-DELAY_STEP = 0.01
+DELAY_STEP = 0.004
 
 # saved config values
 fn_calib = 'calibration.cfg'
