@@ -34,7 +34,8 @@ parser.add_argument('angle1', type=float)
 parser.add_argument('angle2', type=float)
 parser.add_argument('angle3', type=float)
 parser.add_argument('-e', '--easing', action='store_true')
-IS_EASEING = True if args.easing else IS_EASEING = False
+args = parser.parse_args()
+IS_EASEING = True if args.easing else False
 
 # calibration for the motors
 calib = []
@@ -82,7 +83,8 @@ def set_angle(idx_motor, angle):
             pwm.set_pwm(ports[idx_motor], 0, get_pulse(computed))
             time.sleep(DELAY_STEP)
     else:
-        pwm.set_pwm(ports[idx_motor], 0, get_pulse(angle))
+        computed = calib[idx_motor] - angles_now[idx_motor] - (angle-angles_now[idx_motor])
+        pwm.set_pwm(ports[idx_motor], 0, get_pulse(computed))
 
 def drive_motors(angles):
     global angles_now
